@@ -52,7 +52,7 @@ FRUITS&BLOW（フルブロ）は、論理的推理力を使ってフルーツの
 ## 🚀 プレイ方法
 
 ### オンラインでプレイ
-- GitHub Pages: [こちらからプレイ](https://ryunskeee.github.io/fruits-blow/)
+- GitHub Pages: [こちらからプレイ](https://ryunskeee.github.io/FRUITS-BLOW/)
 
 ### ローカルでプレイ
 1. ファイルをダウンロード
@@ -103,4 +103,5 @@ Issues や Pull Request をお気軽にお送りください。
 ---
 
 **楽しいフルブロライフを！** 🍎🍊🍇🍌🍓
+
 
