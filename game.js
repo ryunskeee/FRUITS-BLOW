@@ -313,6 +313,63 @@ class OnlineRanking {
     }
 }
 
+// 広告システム
+class AdSystem {
+    constructor() {
+        this.rewardedAds = null;
+        this.isAdReady = false;
+        this.initAds();
+    }
+    
+    initAds() {
+        // Google AdBreak API の初期化（ゲーム向け動画広告）
+        if (typeof adsbygoogle !== 'undefined') {
+            console.log('AdSense initialized');
+        }
+        
+        // リワード広告の準備
+        this.prepareRewardedAd();
+    }
+    
+    prepareRewardedAd() {
+        // ここで動画広告を準備
+        // 実際の実装では広告プロバイダーのSDKを使用
+        this.isAdReady = true;
+    }
+    
+    showRewardedAd(onReward) {
+        if (!this.isAdReady) {
+            console.log('広告の準備ができていません');
+            return false;
+        }
+        
+        // デモ用の疑似広告表示
+        const showAd = confirm('広告を視聴してヒントを獲得しますか？\n（実際の実装では動画広告が表示されます）');
+        
+        if (showAd) {
+            // 報酬を付与
+            setTimeout(() => {
+                onReward();
+                console.log('広告視聴完了！報酬を付与しました');
+            }, 1000);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    showInterstitialAd() {
+        // ゲーム間の全画面広告
+        if (typeof adsbygoogle !== 'undefined') {
+            // インタースティシャル広告の表示
+            console.log('インタースティシャル広告を表示');
+        }
+    }
+}
+
+// 広告システムインスタンス
+const adSystem = new AdSystem();
+
 // ゲーム設定
 const GAME_CONFIG = {
     MAX_ATTEMPTS: Infinity, // 無制限に変更
@@ -931,13 +988,20 @@ function showHint() {
         return;
     }
     
-    if (gameState.attempts >= 5) {
-        const randomIndex = Math.floor(Math.random() * GAME_CONFIG.ANSWER_LENGTH);
-        const hintJuice = gameState.answer[randomIndex];
-        const juiceName = GAME_CONFIG.JUICE_NAMES[hintJuice];
-        alert(`ヒント: ${randomIndex + 1}番目は${juiceName}(${hintJuice})です！`);
+    if (gameState.attempts >= 3) {
+        // 広告を視聴してヒントを獲得
+        const success = adSystem.showRewardedAd(() => {
+            const randomIndex = Math.floor(Math.random() * GAME_CONFIG.ANSWER_LENGTH);
+            const hintJuice = gameState.answer[randomIndex];
+            const juiceName = GAME_CONFIG.FRUIT_NAMES[hintJuice];
+            alert(`🎬 広告視聴ありがとう！\nヒント: ${randomIndex + 1}番目は${juiceName}(${hintJuice})です！`);
+        });
+        
+        if (!success) {
+            alert('広告が利用できません。もう少し頑張ってみてください！');
+        }
     } else {
-        alert('ヒントは5回目以降から使えます！');
+        alert('ヒントは3回目以降から使えます！\n（広告視聴で獲得できます）');
     }
 }
 

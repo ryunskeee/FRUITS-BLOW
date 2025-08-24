@@ -9,6 +9,10 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Google AdSense（実際のpub-idに置き換える） -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX"
+            crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="game-container">
@@ -32,6 +36,16 @@
                     <input type="range" id="volumeSlider" min="0" max="100" value="50">
                 </span>
             </div>
+        </div>
+        
+        <!-- 広告エリア（上部バナー） -->
+        <div class="ad-container ad-top">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXXX"
+                 data-ad-slot="1234567890"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
         </div>
         
         <div class="game-info">
@@ -142,6 +156,16 @@
             <button id="playAgainBtn">もう一度プレイ</button>
         </div>
 
+        <!-- 広告エリア（下部バナー） -->
+        <div class="ad-container ad-bottom">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-8979982463694921"
+                 data-ad-slot="0987654321"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+
         <div class="rules">
             <details>
                 <summary>ルール説明</summary>
@@ -154,5 +178,11 @@
         </div>
     </div>
     <script src="game.js"></script>
+    
+    <!-- AdSense広告初期化 -->
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
 </body>
 </html>
