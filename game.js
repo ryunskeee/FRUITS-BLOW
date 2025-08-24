@@ -214,6 +214,105 @@ class AudioSystem {
 // 音響システムインスタンス
 const audioSystem = new AudioSystem();
 
+// Firebase設定
+const firebaseConfig = {
+    apiKey: "AIzaSyDDemo-Key-Replace-With-Real-Key",
+    authDomain: "fruits-blow-demo.firebaseapp.com",
+    projectId: "fruits-blow-demo",
+    storageBucket: "fruits-blow-demo.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:demo123456789012"
+};
+
+// Firebase初期化（デモ用設定 - 実際の使用時は適切な設定に変更）
+let db = null;
+let isOnlineMode = false;
+
+function initFirebase() {
+    try {
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+        } else {
+            console.log('Firebase not loaded - using local mode only');
+        }
+    } catch (error) {
+        console.log('Firebase initialization failed:', error);
+        console.log('Falling back to local mode');
+    }
+}
+
+// オンラインランキング機能
+class OnlineRanking {
+    static async addScore(slotCount, playerName, time, attempts) {
+        if (!db || !isOnlineMode) return false;
+        
+        try {
+            await db.collection('rankings').add({
+                slotCount: slotCount,
+                playerName: playerName,
+                time: time,
+                attempts: attempts,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                date: new Date().toISOString().split('T')[0]
+            });
+            return true;
+        } catch (error) {
+            console.error('Error adding score to online ranking:', error);
+            return false;
+        }
+    }
+    
+    static async getRanking(slotCount, limit = 50) {
+        if (!db || !isOnlineMode) return [];
+        
+        try {
+            const snapshot = await db.collection('rankings')
+                .where('slotCount', '==', slotCount)
+                .orderBy('time')
+                .limit(limit)
+                .get();
+            
+            const rankings = [];
+            snapshot.forEach(doc => {
+                rankings.push(doc.data());
+            });
+            
+            return rankings;
+        } catch (error) {
+            console.error('Error getting online ranking:', error);
+            return [];
+        }
+    }
+    
+    static async getPlayerStats(playerName) {
+        if (!db || !isOnlineMode) return null;
+        
+        try {
+            const snapshot = await db.collection('rankings')
+                .where('playerName', '==', playerName)
+                .get();
+            
+            let totalGames = 0;
+            let bestTimes = {};
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                totalGames++;
+                if (!bestTimes[data.slotCount] || data.time < bestTimes[data.slotCount]) {
+                    bestTimes[data.slotCount] = data.time;
+                }
+            });
+            
+            return { totalGames, bestTimes };
+        } catch (error) {
+            console.error('Error getting player stats:', error);
+            return null;
+        }
+    }
+}
+
 // ゲーム設定
 const GAME_CONFIG = {
     MAX_ATTEMPTS: Infinity, // 無制限に変更
@@ -323,9 +422,10 @@ function savePlayerName() {
 }
 
 // ランキング機能
-function addToRanking(slotCount, time, attempts) {
+async function addToRanking(slotCount, time, attempts) {
     if (currentPlayer === 'ゲスト') return;
     
+    // ローカルランキングに追加
     const rankings = getRankingData();
     const key = `slot_${slotCount}`;
     
@@ -347,6 +447,18 @@ function addToRanking(slotCount, time, attempts) {
     rankings[key] = rankings[key].slice(0, 10);
     
     saveRankingData(rankings);
+    
+    // オンラインランキングに追加（可能な場合）
+    if (isOnlineMode) {
+        try {
+            const success = await OnlineRanking.addScore(slotCount, currentPlayer, time, attempts);
+            if (success) {
+                console.log('スコアをオンラインランキングに追加しました');
+            }
+        } catch (error) {
+            console.log('オンラインランキングへの追加に失敗しました:', error);
+        }
+    }
 }
 
 function formatTime(seconds) {
@@ -355,11 +467,32 @@ function formatTime(seconds) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
-function showRanking() {
+async function showRanking() {
     const slotCount = parseInt(rankingSlotCountSelect.value);
-    const rankings = getRankingData();
-    const key = `slot_${slotCount}`;
-    const records = rankings[key] || [];
+    
+    rankingList.innerHTML = '<div class="loading">読み込み中...</div>';
+    
+    let records = [];
+    
+    if (isOnlineMode) {
+        // オンラインランキングを取得
+        try {
+            records = await OnlineRanking.getRanking(slotCount);
+            console.log('オンラインランキングを表示します');
+        } catch (error) {
+            console.log('オンラインランキングの取得に失敗しました:', error);
+            isOnlineMode = false;
+            updateRankingModeUI();
+        }
+    }
+    
+    if (!isOnlineMode) {
+        // ローカルランキングを取得
+        const rankings = getRankingData();
+        const key = `slot_${slotCount}`;
+        records = rankings[key] || [];
+        console.log('ローカルランキングを表示します');
+    }
     
     rankingList.innerHTML = '';
     
@@ -380,7 +513,7 @@ function showRanking() {
             
             const player = document.createElement('div');
             player.className = 'ranking-player';
-            player.textContent = record.player;
+            player.textContent = isOnlineMode ? record.playerName : record.player;
             
             const time = document.createElement('div');
             time.className = 'ranking-time';
@@ -859,6 +992,45 @@ const toggleBGMButton = document.getElementById('toggleBGM');
 const toggleSFXButton = document.getElementById('toggleSFX');
 const volumeSlider = document.getElementById('volumeSlider');
 
+// ランキングモード関連の要素
+const localRankingBtn = document.getElementById('localRankingBtn');
+const onlineRankingBtn = document.getElementById('onlineRankingBtn');
+
+// ランキングモード切り替え関数
+function updateRankingModeUI() {
+    localRankingBtn.classList.toggle('active', !isOnlineMode);
+    onlineRankingBtn.classList.toggle('active', isOnlineMode);
+    
+    if (isOnlineMode && !db) {
+        // オンラインモードだがFirebaseが利用できない場合
+        isOnlineMode = false;
+        localRankingBtn.classList.add('active');
+        onlineRankingBtn.classList.remove('active');
+        alert('オンライン機能が利用できません。ローカルモードに切り替えます。');
+    }
+}
+
+// ランキングモードイベントリスナー
+localRankingBtn.addEventListener('click', () => {
+    isOnlineMode = false;
+    updateRankingModeUI();
+    if (rankingSection.style.display === 'block') {
+        showRanking();
+    }
+});
+
+onlineRankingBtn.addEventListener('click', () => {
+    if (db) {
+        isOnlineMode = true;
+        updateRankingModeUI();
+        if (rankingSection.style.display === 'block') {
+            showRanking();
+        }
+    } else {
+        alert('オンライン機能を使用するには、適切なFirebase設定が必要です。');
+    }
+});
+
 toggleBGMButton.addEventListener('click', () => {
     const isEnabled = audioSystem.toggleBGM();
     toggleBGMButton.classList.toggle('active', isEnabled);
@@ -890,5 +1062,7 @@ document.addEventListener('click', () => {
 });
 
 // 初期化
+initFirebase(); // Firebase初期化
 updatePlayerDisplay();
+updateRankingModeUI(); // ランキングモードUI初期化
 applyDifficulty();

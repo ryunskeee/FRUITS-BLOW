@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FRUITS&BLOW（フルブロ）</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="game-container">
@@ -102,6 +106,10 @@
             <div class="ranking-header">
                 <h3>🏆 タイムランキング 🏆</h3>
                 <div class="ranking-controls">
+                    <div class="ranking-mode">
+                        <button id="localRankingBtn" class="ranking-mode-btn active">📱 ローカル</button>
+                        <button id="onlineRankingBtn" class="ranking-mode-btn">🌐 オンライン</button>
+                    </div>
                     <select id="rankingSlotCount">
                         <option value="3">3個</option>
                         <option value="4" selected>4個</option>
