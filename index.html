@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FRUITS&BLOW（フルブロ）</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🍎 FRUITS&BLOW 🍊</h1>
+        <div class="game-subtitle">〜フルブロ〜</div>
+        
+        <div class="user-section">
+            <div class="user-input">
+                <label for="playerName">プレイヤー名：</label>
+                <input type="text" id="playerName" placeholder="名前を入力" maxlength="10">
+                <button id="savePlayerName">保存</button>
+            </div>
+            <div class="current-player">
+                <span>現在のプレイヤー: <span id="currentPlayerName">ゲスト</span></span>
+            </div>
+        </div>
+        
+        <div class="game-info">
+            <p>フルーツの順番を当てよう！</p>
+            <div class="difficulty-selection">
+                <label for="slotCount">枠の数を選択：</label>
+                <select id="slotCount">
+                    <option value="3">3個（簡単）</option>
+                    <option value="4" selected>4個（普通）</option>
+                    <option value="5">5個（難しい）</option>
+                    <option value="6">6個（とても難しい）</option>
+                    <option value="7">7個</option>
+                    <option value="8">8個</option>
+                    <option value="9">9個</option>
+                    <option value="10">10個</option>
+                    <option value="11">11個</option>
+                    <option value="12">12個</option>
+                    <option value="13">13個</option>
+                    <option value="14">14個</option>
+                    <option value="15">15個（超難しい）</option>
+                </select>
+                <button id="applyDifficulty">適用</button>
+            </div>
+            <div class="score-info">
+                <span>試行回数: <span id="attempts">0</span>/10</span>
+                <span>時間: <span id="timer">00:00</span></span>
+            </div>
+        </div>
+
+        <div class="juice-selection">
+            <h3>フルーツを並べ替えよう：</h3>
+            <div class="juice-buttons" id="juiceButtons">
+                <!-- フルーツボタンは動的に生成されます -->
+            </div>
+            <p class="instruction">※ 各フルーツは必ず1回ずつ使います</p>
+            <p class="instruction">※ 全て配置後はスロットをクリックして順番を入れ替えます</p>
+        </div>
+
+        <div class="current-guess">
+            <h3>現在の予想：</h3>
+            <div class="guess-slots" id="guessSlots">
+                <!-- スロットは動的に生成されます -->
+            </div>
+            <div class="guess-controls">
+                <button id="submitGuess" disabled>予想を送信！</button>
+                <button id="clearGuess">クリア</button>
+            </div>
+            
+            <div class="current-result" id="currentResult" style="display: none;">
+                <div class="result-display">
+                    <span class="result-text" id="resultText">結果: </span>
+                    <span class="hit-count" id="hitCount">🎯 0 ヒット</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="history">
+            <div class="history-header">
+                <h3>予想履歴：</h3>
+                <button id="toggleHistory">履歴を表示</button>
+            </div>
+            <div id="guessHistory" style="display: none;"></div>
+        </div>
+
+        <div class="controls">
+            <button id="newGameBtn">新しいゲーム</button>
+            <button id="hintBtn">ヒント</button>
+            <button id="showRankingBtn">ランキング表示</button>
+        </div>
+
+        <div class="ranking-section" id="rankingSection" style="display: none;">
+            <div class="ranking-header">
+                <h3>🏆 タイムランキング 🏆</h3>
+                <div class="ranking-controls">
+                    <select id="rankingSlotCount">
+                        <option value="3">3個</option>
+                        <option value="4" selected>4個</option>
+                        <option value="5">5個</option>
+                        <option value="6">6個</option>
+                        <option value="7">7個</option>
+                        <option value="8">8個</option>
+                        <option value="9">9個</option>
+                        <option value="10">10個</option>
+                        <option value="11">11個</option>
+                        <option value="12">12個</option>
+                        <option value="13">13個</option>
+                        <option value="14">14個</option>
+                        <option value="15">15個</option>
+                    </select>
+                    <button id="closeRankingBtn">閉じる</button>
+                </div>
+            </div>
+            <div class="ranking-list" id="rankingList">
+                <!-- ランキングは動的に生成されます -->
+            </div>
+        </div>
+
+        <div class="game-result" id="gameResult" style="display: none;">
+            <h2 id="resultTitle">おめでとう！</h2>
+            <p id="resultMessage">正解です！</p>
+            <div class="result-answer">
+                <p>正解は：<span id="correctAnswer"></span></p>
+            </div>
+            <button id="playAgainBtn">もう一度プレイ</button>
+        </div>
+
+        <div class="rules">
+            <details>
+                <summary>ルール説明</summary>
+                <div class="rules-content">
+                    <p><strong>🎯 ヒット:</strong> 正しい位置にある正しいフルーツ</p>
+                    <p><strong>目標:</strong> 10回以内にフルーツの正しい順番を当てよう！</p>
+                    <p><strong>ルール:</strong> 選択した数のフルーツを1回ずつ使って並べます</p>
+                </div>
+            </details>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
