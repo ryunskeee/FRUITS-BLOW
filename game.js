@@ -1,8 +1,222 @@
 // FRUITS&BLOW（フルブロ）ゲーム
 
+// 音響システム
+class AudioSystem {
+    constructor() {
+        this.audioContext = null;
+        this.bgmGain = null;
+        this.sfxGain = null;
+        this.bgmOscillators = [];
+        this.isBGMEnabled = true;
+        this.isSFXEnabled = true;
+        this.volume = 0.5;
+        this.bgmPlaying = false;
+        this.initAudio();
+    }
+
+    async initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // BGM用のゲインノード
+            this.bgmGain = this.audioContext.createGain();
+            this.bgmGain.gain.value = 0.25;
+            this.bgmGain.connect(this.audioContext.destination);
+            
+            // 効果音用のゲインノード
+            this.sfxGain = this.audioContext.createGain();
+            this.sfxGain.gain.value = 0.3;
+            this.sfxGain.connect(this.audioContext.destination);
+        } catch (error) {
+            console.log('Audio context initialization failed:', error);
+        }
+    }
+
+    async ensureAudioContext() {
+        if (!this.audioContext) {
+            await this.initAudio();
+        }
+        if (this.audioContext.state === 'suspended') {
+            await this.audioContext.resume();
+        }
+    }
+
+    // BGM関連
+    async startBGM() {
+        if (!this.isBGMEnabled || this.bgmPlaying) return;
+        
+        await this.ensureAudioContext();
+        this.bgmPlaying = true;
+        this.playBGMLoop();
+    }
+
+    playBGMLoop() {
+        if (!this.isBGMEnabled || !this.bgmPlaying) return;
+        
+        const melody = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50]; // C-C高音
+        const rhythm = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1.0];
+        
+        let time = this.audioContext.currentTime;
+        
+        melody.forEach((freq, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            
+            osc.type = 'triangle'; // よりリッチなサウンドに変更
+            osc.frequency.setValueAtTime(freq, time);
+            
+            gain.gain.setValueAtTime(0, time);
+            gain.gain.linearRampToValueAtTime(0.05, time + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + rhythm[i]);
+            
+            osc.connect(gain);
+            gain.connect(this.bgmGain);
+            
+            osc.start(time);
+            osc.stop(time + rhythm[i]);
+            
+            time += rhythm[i];
+        });
+        
+        // ループ
+        setTimeout(() => {
+            if (this.bgmPlaying) {
+                this.playBGMLoop();
+            }
+        }, time * 1000 - this.audioContext.currentTime * 1000 + 500);
+    }
+
+    stopBGM() {
+        this.bgmPlaying = false;
+        this.bgmOscillators.forEach(osc => {
+            try { osc.stop(); } catch(e) {}
+        });
+        this.bgmOscillators = [];
+    }
+
+    // 効果音
+    async playSelectSound() {
+        if (!this.isSFXEnabled) return;
+        await this.ensureAudioContext();
+        
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(800, this.audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1000, this.audioContext.currentTime + 0.1);
+        
+        gain.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+        
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        
+        osc.start();
+        osc.stop(this.audioContext.currentTime + 0.1);
+    }
+
+    async playHitSound() {
+        if (!this.isSFXEnabled) return;
+        await this.ensureAudioContext();
+        
+        // キラキラ音
+        const frequencies = [1047, 1175, 1319, 1397];
+        frequencies.forEach((freq, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, this.audioContext.currentTime + i * 0.05);
+            
+            gain.gain.setValueAtTime(0.15, this.audioContext.currentTime + i * 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + i * 0.05 + 0.3);
+            
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+            
+            osc.start(this.audioContext.currentTime + i * 0.05);
+            osc.stop(this.audioContext.currentTime + i * 0.05 + 0.3);
+        });
+    }
+
+    async playSuccessSound() {
+        if (!this.isSFXEnabled) return;
+        await this.ensureAudioContext();
+        
+        // 勝利のファンファーレ
+        const melody = [523, 659, 784, 1047];
+        melody.forEach((freq, i) => {
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(freq, this.audioContext.currentTime + i * 0.2);
+            
+            gain.gain.setValueAtTime(0.2, this.audioContext.currentTime + i * 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + i * 0.2 + 0.4);
+            
+            osc.connect(gain);
+            gain.connect(this.sfxGain);
+            
+            osc.start(this.audioContext.currentTime + i * 0.2);
+            osc.stop(this.audioContext.currentTime + i * 0.2 + 0.4);
+        });
+    }
+
+    async playErrorSound() {
+        if (!this.isSFXEnabled) return;
+        await this.ensureAudioContext();
+        
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, this.audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.3);
+        
+        gain.gain.setValueAtTime(0.15, this.audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(this.sfxGain);
+        
+        osc.start();
+        osc.stop(this.audioContext.currentTime + 0.3);
+    }
+
+    setVolume(volume) {
+        this.volume = volume;
+        if (this.bgmGain) {
+            this.bgmGain.gain.value = 0.25 * volume;
+        }
+        if (this.sfxGain) {
+            this.sfxGain.gain.value = 0.3 * volume;
+        }
+    }
+
+    toggleBGM() {
+        this.isBGMEnabled = !this.isBGMEnabled;
+        if (this.isBGMEnabled) {
+            this.startBGM();
+        } else {
+            this.stopBGM();
+        }
+        return this.isBGMEnabled;
+    }
+
+    toggleSFX() {
+        this.isSFXEnabled = !this.isSFXEnabled;
+        return this.isSFXEnabled;
+    }
+}
+
+// 音響システムインスタンス
+const audioSystem = new AudioSystem();
+
 // ゲーム設定
 const GAME_CONFIG = {
-    MAX_ATTEMPTS: 10,
+    MAX_ATTEMPTS: Infinity, // 無制限に変更
     ANSWER_LENGTH: 4, // デフォルト値、動的に変更される
     MAX_SLOTS: 15,
     ALL_FRUITS: ['🍎', '🍊', '🍇', '🍌', '🍓', '🥝', '🍑', '🍒', '🥭', '🍍', '🥥', '🍉', '🍈', '🫐', '🍋'], // 15種類
@@ -356,6 +570,7 @@ function addFruitToGuess(fruit) {
     const emptySlotIndex = gameState.currentGuess.indexOf('');
     if (emptySlotIndex !== -1) {
         gameState.currentGuess[emptySlotIndex] = fruit;
+        audioSystem.playSelectSound(); // 効果音追加
         updateGuessSlots();
         checkSubmitButton();
         updateFruitButtonStates();
@@ -444,12 +659,6 @@ function submitGuess() {
         return;
     }
     
-    // 試行回数上限チェック
-    if (gameState.attempts >= GAME_CONFIG.MAX_ATTEMPTS) {
-        endGame(false);
-        return;
-    }
-    
     // 次の予想のために選択状態をリセット（スロットの内容は保持）
     selectedSlotIndex = -1;
     updateSlotSelection();
@@ -474,22 +683,27 @@ function calculateHitBlow(guess, answer) {
 function showCurrentResult(hits) {
     hitCountElement.textContent = `🎯 ${hits} ヒット`;
     
-    // ヒット数に応じてメッセージを変更
+    // ヒット数に応じて音とメッセージを変更
     if (hits === GAME_CONFIG.ANSWER_LENGTH) {
         resultTextElement.textContent = "🎉 完全正解！ ";
         currentResultElement.style.background = "linear-gradient(45deg, #fd79a8, #e84393)";
+        audioSystem.playSuccessSound();
     } else if (hits >= GAME_CONFIG.ANSWER_LENGTH * 0.75) {
         resultTextElement.textContent = "👍 あと少し！ ";
         currentResultElement.style.background = "linear-gradient(45deg, #fdcb6e, #e17055)";
+        audioSystem.playHitSound();
     } else if (hits >= GAME_CONFIG.ANSWER_LENGTH * 0.5) {
         resultTextElement.textContent = "😊 良い感じ！ ";
         currentResultElement.style.background = "linear-gradient(45deg, #74b9ff, #0984e3)";
+        audioSystem.playHitSound();
     } else if (hits > 0) {
         resultTextElement.textContent = "🤔 まずまず... ";
         currentResultElement.style.background = "linear-gradient(45deg, #00b894, #00cec9)";
+        audioSystem.playSelectSound();
     } else {
         resultTextElement.textContent = "😅 頑張って！ ";
         currentResultElement.style.background = "linear-gradient(45deg, #a29bfe, #6c5ce7)";
+        audioSystem.playErrorSound();
     }
     
     // アニメーション効果で表示
@@ -556,16 +770,15 @@ function endGame(isWin) {
         // ランキングに追加
         addToRanking(GAME_CONFIG.ANSWER_LENGTH, playTime, gameState.attempts);
         
+        // 勝利音を再生
+        setTimeout(() => audioSystem.playSuccessSound(), 500);
+        
         resultTitleElement.textContent = '🎉 おめでとう！ 🎉';
         resultMessageElement.textContent = `${gameState.attempts}回で正解しました！時間: ${formatTime(playTime)}`;
         resultTitleElement.style.color = '#00b894';
         gameResultElement.style.borderColor = '#00b894';
-    } else {
-        resultTitleElement.textContent = '😢 ゲームオーバー 😢';
-        resultMessageElement.textContent = '10回で正解できませんでした...';
-        resultTitleElement.style.color = '#e74c3c';
-        gameResultElement.style.borderColor = '#e74c3c';
     }
+    // 無制限なのでゲームオーバーは削除
     
     correctAnswerElement.textContent = gameState.answer.join(' ');
     gameResultElement.style.display = 'block';
@@ -639,6 +852,41 @@ hintButton.addEventListener('click', showHint);
 playAgainButton.addEventListener('click', () => {
     gameResultElement.style.display = 'none';
     initGame();
+});
+
+// 音響コントロールのイベントリスナー
+const toggleBGMButton = document.getElementById('toggleBGM');
+const toggleSFXButton = document.getElementById('toggleSFX');
+const volumeSlider = document.getElementById('volumeSlider');
+
+toggleBGMButton.addEventListener('click', () => {
+    const isEnabled = audioSystem.toggleBGM();
+    toggleBGMButton.classList.toggle('active', isEnabled);
+    toggleBGMButton.textContent = isEnabled ? '🎵 BGM' : '🔇 BGM';
+});
+
+toggleSFXButton.addEventListener('click', () => {
+    const isEnabled = audioSystem.toggleSFX();
+    toggleSFXButton.classList.toggle('active', isEnabled);
+    toggleSFXButton.textContent = isEnabled ? '🔊 効果音' : '🔇 効果音';
+});
+
+volumeSlider.addEventListener('input', (e) => {
+    const volume = e.target.value / 100;
+    audioSystem.setVolume(volume);
+});
+
+// 初期状態設定
+toggleBGMButton.classList.add('active');
+toggleSFXButton.classList.add('active');
+
+// ユーザーの最初のクリックでBGM開始
+let userInteracted = false;
+document.addEventListener('click', () => {
+    if (!userInteracted) {
+        userInteracted = true;
+        audioSystem.startBGM();
+    }
 });
 
 // 初期化
