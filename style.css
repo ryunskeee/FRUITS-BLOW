@@ -1,3 +1,99 @@
+/* --- バズる若者向けネオン・ポップデザイン追加 --- */
+body, .tony-bg {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%) !important;
+    font-family: 'Poppins', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+}
+.farm-panel, .farm-scoreboard, .game-info, .juice-selection {
+    background: rgba(255,255,255,0.85) !important;
+    border: 2.5px solid #ff5e62 !important;
+    border-radius: 22px !important;
+    box-shadow: 0 0 24px #ff5e62aa, 0 2px 0 #fffbe6 inset !important;
+    transition: box-shadow 0.3s, border 0.3s;
+}
+.farm-panel:hover, .farm-scoreboard:hover {
+    box-shadow: 0 0 40px #ff9966cc, 0 2px 0 #fffbe6 inset !important;
+    border-color: #ff9966 !important;
+}
+.farm-logo-main {
+    font-size: 2.6rem !important;
+    font-family: 'Poppins', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    color: #ff5e62 !important;
+    letter-spacing: 3px;
+    text-shadow: 0 2px 12px #ff5e62aa, 0 0 2px #fff;
+}
+.farm-logo-sub {
+    background: linear-gradient(90deg, #ff9966 0%, #ff5e62 100%) !important;
+    color: #fff !important;
+    font-size: 1.2rem !important;
+    box-shadow: 0 2px 12px #ff5e62aa;
+}
+.tony-btn, button, select {
+    background: linear-gradient(90deg, #ff9966 0%, #ff5e62 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1.1rem !important;
+    font-family: 'Poppins', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    box-shadow: 0 2px 8px #ff5e62aa;
+    padding: 8px 18px !important;
+    margin: 4px 0;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.tony-btn:hover, button:hover, select:hover {
+    background: linear-gradient(90deg, #fcb69f 0%, #ff5e62 100%) !important;
+    box-shadow: 0 4px 16px #ff5e62cc;
+}
+input[type="text"], input[type="range"] {
+    border: 2px solid #ff5e62 !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    font-size: 1.1rem !important;
+    font-family: 'Poppins', 'Segoe UI', 'Arial Rounded MT Bold', 'Arial', sans-serif;
+    background: #fff !important;
+    color: #ff5e62 !important;
+    margin: 2px 0;
+}
+.farm-logo-veg {
+    filter: drop-shadow(0 0 8px #ff5e62cc) !important;
+}
+.game-info p, .juice-selection h3, .score-info, .tony-label {
+    color: #ff5e62 !important;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+}
+.juice-buttons button {
+    font-size: 1.5rem !important;
+    border-radius: 50% !important;
+    width: 48px !important;
+    height: 48px !important;
+    margin: 0 6px 8px 6px !important;
+    box-shadow: 0 2px 8px #ff5e62aa;
+    background: linear-gradient(135deg, #fffbe6 60%, #ff5e62 100%) !important;
+    color: #ff5e62 !important;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.juice-buttons button:hover {
+    transform: scale(1.15) rotate(-8deg);
+    box-shadow: 0 6px 24px #ff5e62cc;
+}
+.ad-container {
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 12px 0;
+    box-shadow: 0 2px 12px #ff5e6244;
+}
+.farm-user-section label, .volume-control label {
+    color: #ff5e62 !important;
+    font-weight: bold;
+}
+.farm-scoreboard {
+    background: rgba(255,255,255,0.95) !important;
+    border: 2.5px solid #ff5e62 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 0 18px #ff5e62aa, 0 2px 0 #fffbe6 inset !important;
+}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
 /* --- 農園パネル・装飾 --- */
 .farm-panel {
     background: linear-gradient(180deg, #fffbe6 80%, #e0cfa6 100%);
