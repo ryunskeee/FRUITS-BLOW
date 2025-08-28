@@ -17,22 +17,38 @@
      crossorigin="anonymous"></script>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🍎 FRUITS&BLOW 🍊</h1>
-        <div class="game-subtitle">〜フルブロ〜</div>
-        
-        <div class="user-section">
+    <div class="game-container tony-bg">
+        <header class="tony-header">
+            <div class="farm-logo">
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f955.svg" alt="にんじん" class="farm-logo-veg">
+                <span class="farm-logo-main">FARM &amp; BLOW</span>
+                <img src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f966.svg" alt="ブロッコリー" class="farm-logo-veg">
+                <span class="farm-logo-sub">畑でフルブロ</span>
+            </div>
+        </header>
+    <div class="farm-scoreboard farm-panel">
+            <div class="tony-score-item">
+                <span class="tony-label">PLAYER</span>
+                <span id="currentPlayerName" class="tony-value">ゲスト</span>
+            </div>
+            <div class="tony-score-item">
+                <span class="tony-label">ATTEMPTS</span>
+                <span id="attempts" class="tony-value">0</span>
+            </div>
+            <div class="tony-score-item">
+                <span class="tony-label">TIME</span>
+                <span id="timer" class="tony-value">00:00</span>
+            </div>
+        </div>
+    <div class="farm-user-section farm-panel">
             <div class="user-input">
                 <label for="playerName">プレイヤー名：</label>
                 <input type="text" id="playerName" placeholder="名前を入力" maxlength="10">
-                <button id="savePlayerName">保存</button>
-            </div>
-            <div class="current-player">
-                <span>現在のプレイヤー: <span id="currentPlayerName">ゲスト</span></span>
+                <button id="savePlayerName" class="tony-btn">保存</button>
             </div>
             <div class="audio-controls">
-                <button id="toggleBGM" title="BGMのオン/オフ">🎵 BGM</button>
-                <button id="toggleSFX" title="効果音のオン/オフ">🔊 効果音</button>
+                <button id="toggleBGM" title="BGMのオン/オフ" class="tony-btn">🎵</button>
+                <button id="toggleSFX" title="効果音のオン/オフ" class="tony-btn">🔊</button>
                 <span class="volume-control">
                     <label for="volumeSlider">音量:</label>
                     <input type="range" id="volumeSlider" min="0" max="100" value="50">
@@ -50,7 +66,7 @@
                  data-full-width-responsive="true"></ins>
         </div>
         
-        <div class="game-info">
+    <div class="game-info farm-panel">
             <p>フルーツの順番を当てよう！</p>
             <div class="difficulty-selection">
                 <label for="slotCount">枠の数を選択：</label>
@@ -59,11 +75,11 @@
                     <option value="4" selected>4個（普通）</option>
                     <option value="5">5個（難しい）</option>
                     <option value="6">6個（とても難しい）</option>
-                    <option value="7">7個</option>
+                    <div class="farm-user-section">
                     <option value="8">8個</option>
                     <option value="9">9個</option>
                     <option value="10">10個</option>
-                    <option value="11">11個</option>
+                            <button id="savePlayerName" class="farm-btn">保存</button>
                     <option value="12">12個</option>
                     <option value="13">13個</option>
                     <option value="14">14個</option>
@@ -77,7 +93,7 @@
             </div>
         </div>
 
-        <div class="juice-selection">
+    <div class="juice-selection farm-panel">
             <h3>フルーツを並べ替えよう：</h3>
             <div class="juice-buttons" id="juiceButtons">
                 <!-- フルーツボタンは動的に生成されます -->
@@ -86,7 +102,7 @@
             <p class="instruction">※ 全て配置後はスロットをクリックして順番を入れ替えます</p>
         </div>
 
-        <div class="current-guess">
+    <div class="current-guess farm-panel">
             <h3>現在の予想：</h3>
             <div class="guess-slots" id="guessSlots">
                 <!-- スロットは動的に生成されます -->
@@ -104,7 +120,7 @@
             </div>
         </div>
 
-        <div class="history">
+    <div class="history farm-panel">
             <div class="history-header">
                 <h3>予想履歴：</h3>
                 <button id="toggleHistory">履歴を表示</button>
@@ -112,13 +128,13 @@
             <div id="guessHistory" style="display: none;"></div>
         </div>
 
-        <div class="controls">
+    <div class="controls farm-panel">
             <button id="newGameBtn">新しいゲーム</button>
             <button id="hintBtn">ヒント</button>
             <button id="showRankingBtn">ランキング表示</button>
         </div>
 
-        <div class="ranking-section" id="rankingSection" style="display: none;">
+    <div class="ranking-section farm-panel" id="rankingSection" style="display: none;">
             <div class="ranking-header">
                 <h3>🏆 タイムランキング 🏆</h3>
                 <div class="ranking-controls">
@@ -149,7 +165,7 @@
             </div>
         </div>
 
-        <div class="game-result" id="gameResult" style="display: none;">
+    <div class="game-result farm-panel" id="gameResult" style="display: none;">
             <h2 id="resultTitle">おめでとう！</h2>
             <p id="resultMessage">正解です！</p>
             <div class="result-answer">
@@ -168,7 +184,25 @@
                  data-full-width-responsive="true"></ins>
         </div>
 
-        <div class="rules">
+    <div class="rules farm-panel">
+                <!-- 畑の畝イラスト（SVG） -->
+                <div class="farm-field-rows">
+                    <svg viewBox="0 0 400 60" width="100%" height="60" style="display:block;margin:0 auto;">
+                        <ellipse cx="60" cy="40" rx="55" ry="15" fill="#e0cfa6" stroke="#b89b6a" stroke-width="2"/>
+                        <ellipse cx="200" cy="45" rx="70" ry="18" fill="#d2b48c" stroke="#b89b6a" stroke-width="2"/>
+                        <ellipse cx="340" cy="38" rx="50" ry="13" fill="#e0cfa6" stroke="#b89b6a" stroke-width="2"/>
+                        <ellipse cx="120" cy="55" rx="30" ry="7" fill="#c2b280" stroke="#b89b6a" stroke-width="1.5"/>
+                        <ellipse cx="280" cy="53" rx="28" ry="6" fill="#c2b280" stroke="#b89b6a" stroke-width="1.5"/>
+                        <!-- 芽 -->
+                        <g>
+                            <ellipse cx="60" cy="28" rx="4" ry="10" fill="#7fc97f"/>
+                            <ellipse cx="200" cy="32" rx="5" ry="12" fill="#7fc97f"/>
+                            <ellipse cx="340" cy="25" rx="3.5" ry="8" fill="#7fc97f"/>
+                            <ellipse cx="120" cy="45" rx="2.5" ry="6" fill="#7fc97f"/>
+                            <ellipse cx="280" cy="44" rx="2.5" ry="6" fill="#7fc97f"/>
+                        </g>
+                    </svg>
+                </div>
             <details>
                 <summary>ルール説明</summary>
                 <div class="rules-content">

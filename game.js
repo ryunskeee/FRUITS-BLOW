@@ -443,6 +443,11 @@ const rankingSlotCountSelect = document.getElementById('rankingSlotCount');
 const closeRankingButton = document.getElementById('closeRankingBtn');
 const rankingList = document.getElementById('rankingList');
 
+// 追加: スコアボード用の要素取得
+const attemptsBoardElement = document.getElementById('attemptsBoard');
+const timerBoardElement = document.getElementById('timerBoard');
+const currentPlayerNameBoardElement = document.getElementById('currentPlayerNameBoard');
+
 let juiceButtons = [];
 let isHistoryVisible = false;
 let selectedSlotIndex = -1; // 選択されたスロットのインデックス
@@ -464,6 +469,7 @@ function saveRankingData(rankings) {
 // ユーザー管理機能
 function updatePlayerDisplay() {
     currentPlayerNameElement.textContent = currentPlayer;
+    if (currentPlayerNameBoardElement) currentPlayerNameBoardElement.textContent = currentPlayer;
 }
 
 function savePlayerName() {
@@ -610,18 +616,15 @@ function applyDifficulty() {
 function createFruitButtons() {
     juiceButtonsContainer.innerHTML = '';
     juiceButtons = [];
-    
     currentFruits.forEach(fruit => {
         const button = document.createElement('button');
-        button.className = 'juice-btn';
+        button.className = 'farm-btn';
         button.setAttribute('data-juice', fruit);
         button.setAttribute('data-name', GAME_CONFIG.FRUIT_NAMES[fruit]);
         button.textContent = fruit;
-        
         button.addEventListener('click', () => {
             addFruitToGuess(fruit);
         });
-        
         juiceButtonsContainer.appendChild(button);
         juiceButtons.push(button);
     });
@@ -637,12 +640,11 @@ function createSlots() {
         const slot = document.createElement('div');
         slot.className = 'slot';
         slot.setAttribute('data-position', i);
+        slot.setAttribute('data-theme', 'farm');
         slot.textContent = '?';
-        
         slot.addEventListener('click', () => {
             handleSlotClick(i);
         });
-        
         slotsContainer.appendChild(slot);
         slots.push(slot);
     }
@@ -979,6 +981,9 @@ function endGame(isWin) {
 // UI更新
 function updateUI() {
     attemptsElement.textContent = gameState.attempts;
+    if (attemptsBoardElement) attemptsBoardElement.textContent = gameState.attempts;
+    if (timerBoardElement) timerBoardElement.textContent = timerElement.textContent;
+    if (currentPlayerNameBoardElement) currentPlayerNameBoardElement.textContent = currentPlayerNameElement.textContent;
 }
 
 // ヒント機能
